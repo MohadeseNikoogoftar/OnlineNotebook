@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997197120445",
+    "project_id": "online-notebook-635cf",
+    "storage_bucket": "online-notebook-635cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997197120445:android:eade3aef86c32931a988d4",
+        "android_client_info": {
+          "package_name": "ir.shariaty.mynotes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1ToZt_SAlS95Rn9H0S_M0THcvRc85I7Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
