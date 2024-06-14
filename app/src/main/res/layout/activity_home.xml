@@ -3,25 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
-
-
-    <TextView
+    <Button
+        android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="My Notes"
-        android:textSize="24sp"
-        android:layout_marginBottom="32dp" />
+        android:text="Logout" />
     <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
+        android:id="@+id/addNoteButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login" />
-    <Button
-        android:id="@+id/registerButton"
+        android:text="Add Note"
+        android:layout_marginTop="16dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register"
+        android:layout_height="match_parent"
         android:layout_marginTop="16dp" />
 </LinearLayout>
+
