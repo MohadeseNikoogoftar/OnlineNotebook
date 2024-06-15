@@ -1,5 +1,6 @@
 package ir.shariaty.mynotes
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -7,9 +8,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
@@ -25,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter all the details", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             mAuth.signInWithEmailAndPassword(email, password)
@@ -42,4 +41,5 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
     }
+}
 }
