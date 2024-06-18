@@ -9,25 +9,23 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Bulletjournal"
+        android:theme="@style/Theme.MyNotes."
         tools:targetApi="31">
-
         <activity
             android:name=".MainActivity"
-
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Bulletjournal">
+            android:theme="@style/Theme.MyNotes.">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".LoginActivity" android:theme="@style/Theme.Bulletjournal" />
-        <activity android:name=".RegisterActivity" android:theme="@style/Theme.Bulletjournal" />
-        <activity android:name=".HomeActivity" android:theme="@style/Theme.Bulletjournal" />
-        <activity android:name=".AddNoteActivity" android:theme="@style/Theme.Bulletjournal" />
-        <activity android:name="ir.shariaty.mynotes.HomeActivity$HomeActivity" />
 
+        </activity>
+
+        <activity android:name=".LoginActivity" android:theme="@style/Theme.MyNotes." />
+        <activity android:name=".RegisterActivity" android:theme="@style/Theme.MyNotes." />
+        <activity android:name=".HomeActivity" android:theme="@style/Theme.MyNotes." />
+        <activity android:name=".AddNoteActivity" android:theme="@style/Theme.MyNotes." />
     </application>
 </manifest>
