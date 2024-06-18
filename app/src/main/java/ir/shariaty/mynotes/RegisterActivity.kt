@@ -39,3 +39,4 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 }
+}

@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
 class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
 
     private lateinit var logoutButton: Button
@@ -20,32 +22,28 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
     private lateinit var notesRecyclerView: RecyclerView
     private lateinit var notesAdapter: NotesAdapter
     private lateinit var notesList: MutableList<Note>
+    private lateinit var firestore: FirebaseFirestore
     private var isSelectionMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
         mAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
         logoutButton = findViewById(R.id.logoutButton)
         addNoteButton = findViewById(R.id.addNoteButton)
         deleteNoteButton = findViewById(R.id.deleteNoteButton)
         notesRecyclerView = findViewById(R.id.notesRecyclerView)
-
         notesList = mutableListOf()
         notesAdapter = NotesAdapter(notesList, this)
         notesRecyclerView.adapter = notesAdapter
         notesRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Load notes from a local or remote database (this example uses dummy data)
         loadNotes()
-
         logoutButton.setOnClickListener {
             mAuth.signOut()
-
-            // Clear login state
             val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
             sharedPreferences.edit().putBoolean("isLoggedIn", false).apply()
-
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
@@ -53,7 +51,6 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
             val intent = Intent(this, AddNoteActivity::class.java)
             startActivityForResult(intent, ADD_NOTE_REQUEST_CODE)
         }
-
         deleteNoteButton.setOnClickListener {
             if (notesAdapter.getSelectedNotes().isEmpty()) {
                 Toast.makeText(this, "No notes selected", Toast.LENGTH_SHORT).show()
@@ -62,7 +59,6 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
             }
         }
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -78,49 +74,3 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
             }
         }
     }
-
-    private fun loadNotes() {
-        // Example of adding dummy data, replace this with actual data loading logic
-        notesList.add(Note("Sample Note 1", "This is the content of note 1"))
-        notesList.add(Note("Sample Note 2", "This is the content of note 2"))
-        notesAdapter.notifyDataSetChanged()
-    }
-
-    override fun onItemClick(position: Int) {
-        val intent = Intent(this, AddNoteActivity::class.java)
-        intent.putExtra("note", notesList[position])
-        intent.putExtra("position", position)
-        startActivityForResult(intent, EDIT_NOTE_REQUEST_CODE)
-        if (isSelectionMode) {
-            notesAdapter.toggleSelection(position)
-        } else {
-            val intent = Intent(this, AddNoteActivity::class.java)
-            intent.putExtra("note", notesList[position])
-            intent.putExtra("position", position)
-            startActivityForResult(intent, EDIT_NOTE_REQUEST_CODE)
-        }
-    }
-
-    private fun showDeleteConfirmationDialog() {
-        AlertDialog.Builder(this)
-            .setMessage("Are you sure you want to delete the selected notes?")
-            .setPositiveButton("Delete") { dialog, which ->
-                deleteSelectedNotes()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun deleteSelectedNotes() {
-        val selectedNotes = notesAdapter.getSelectedNotes()
-        notesList.removeAll(selectedNotes)
-        notesAdapter.clearSelection()
-        notesAdapter.notifyDataSetChanged()
-        Toast.makeText(this, "Notes deleted", Toast.LENGTH_SHORT).show()
-    }
-
-    companion object {
-        private const val ADD_NOTE_REQUEST_CODE = 1
-        private const val EDIT_NOTE_REQUEST_CODE = 2
-    }
-}
