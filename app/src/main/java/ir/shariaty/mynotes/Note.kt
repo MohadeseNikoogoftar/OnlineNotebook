@@ -3,14 +3,13 @@ package ir.shariaty.mynotes
 import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
-
 data class Note(
     var documentId: String = "",
     var title: String = "",
     var content: String = "",
-    var userId: String = ""
     var userId: String = "",
     var date: String = "",
+    var imageUrl: String? = null,
     var isChecked: Boolean = false // اضافه کردن متغیر isChecked
 
 ) : Parcelable {
@@ -18,21 +17,23 @@ data class Note(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
         parcel.readString() ?: "",
         parcel.readString() ?: "",
+        parcel.readString(),
         parcel.readByte() != 0.toByte() // خواندن isChecked از Parcel
     )
 
     fun compareTo(other: Note): Int {
         return other.date.compareTo(date)
     }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(documentId)
         parcel.writeString(title)
         parcel.writeString(content)
         parcel.writeString(userId)
         parcel.writeString(date)
+        parcel.writeString(imageUrl)
         parcel.writeByte(if (isChecked) 1 else 0) // نوشتن isChecked به Parcel
     }
 

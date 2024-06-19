@@ -51,12 +51,17 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.0")
     // Use the latest version of Firebase BOM
     implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+
     // Firebase dependencies
+    // Firebase dependencies (no explicit versions needed)
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+
     // Compose dependencies
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
+    implementation ("androidx.compose.ui:ui:1.0.0")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
@@ -70,8 +75,13 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("com.google.android.material:material:1.3.0")
+    implementation("com.squareup.picasso:picasso:2.71828")
 
+    implementation ("androidx.recyclerview:recyclerview:1.2.1")
+    implementation ("com.squareup.picasso:picasso:2.8")
 
     implementation ("com.google.android.material:material:1.3.0")
 
+}
 }
