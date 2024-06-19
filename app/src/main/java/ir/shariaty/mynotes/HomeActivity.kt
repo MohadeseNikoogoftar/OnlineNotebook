@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+
 class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
+
     private lateinit var logoutButton: Button
     private lateinit var addNoteButton: Button
     private lateinit var deleteNoteButton: Button
@@ -25,9 +27,11 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
     private lateinit var notesList: MutableList<Note>
     private lateinit var firestore: FirebaseFirestore
     private var isSelectionMode = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
         mAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         logoutButton = findViewById(R.id.logoutButton)
@@ -40,18 +44,24 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
         notesAdapter = NotesAdapter(notesList, this)
         notesRecyclerView.adapter = notesAdapter
         notesRecyclerView.layoutManager = LinearLayoutManager(this)
+
         loadNotes()
+
         logoutButton.setOnClickListener {
             mAuth.signOut()
+
             val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
             sharedPreferences.edit().putBoolean("isLoggedIn", false).apply()
+
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+
         addNoteButton.setOnClickListener {
             val intent = Intent(this, AddNoteActivity::class.java)
             startActivityForResult(intent, ADD_NOTE_REQUEST_CODE)
         }
+
         deleteNoteButton.setOnClickListener {
             if (notesAdapter.getSelectedNotes().isEmpty()) {
                 Toast.makeText(this, "No notes selected", Toast.LENGTH_SHORT).show()
@@ -79,6 +89,7 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
         if (resultCode == Activity.RESULT_OK) {
             val note = data?.getParcelableExtra<Note>("note")
             val position = data?.getIntExtra("position", -1)
+
             if (note != null) {
                 if (requestCode == ADD_NOTE_REQUEST_CODE) {
                     notesList.add(note)
@@ -89,7 +100,6 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
             }
         }
     }
-
 
     private fun loadNotes() {
         val userId = mAuth.currentUser?.uid ?: return
@@ -104,12 +114,14 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
                     }
                     notesList.add(note)
                 }
+                notesList.sortByDescending { it.date }
                 notesAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Error loading notes: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
     override fun onItemClick(position: Int) {
         if (isSelectionMode) {
             notesAdapter.toggleSelection(position)
@@ -120,6 +132,7 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
             startActivityForResult(intent, EDIT_NOTE_REQUEST_CODE)
         }
     }
+
     private fun showDeleteConfirmationDialog() {
         AlertDialog.Builder(this)
             .setMessage("Are you sure you want to delete the selected notes?")
@@ -129,10 +142,12 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
             .setNegativeButton("Cancel", null)
             .show()
     }
+
     private fun deleteSelectedNotes() {
         val selectedNotes = notesAdapter.getSelectedNotes()
         val userId = mAuth.currentUser?.uid ?: return
         var deleteCount = 0
+
         for (note in selectedNotes) {
             firestore.collection("notes").document(note.documentId)
                 .delete()
@@ -140,7 +155,7 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
                     notesList.remove(note)
                     deleteCount++
                     if (deleteCount == selectedNotes.size) {
-                        // همه یادداشت‌ها حذف شده‌اند
+                        // همه یادداشتها حذف شدهاند
                         notesAdapter.notifyDataSetChanged()
                     }
                 }
@@ -148,16 +163,15 @@ class HomeActivity : AppCompatActivity(), NotesAdapter.OnItemClickListener {
                     Toast.makeText(this, "Error deleting note: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
         }
-        // حذف انتخاب‌ها بعد از حذف موفق
+
+        // حذف انتخابها بعد از حذف موفق
         notesAdapter.clearSelection()
     }
+
     override fun onResume() {
         super.onResume()
         loadNotes()
     }
-
-
-
 
     companion object {
         private const val ADD_NOTE_REQUEST_CODE = 1

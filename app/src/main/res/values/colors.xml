@@ -7,10 +7,7 @@
     <color name="teal_700">#D2366137</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-</resources>
 
-
-<resources>
     <!-- Light mode colors -->
 <color name="colorPrimary">#6200EE</color>
 <color name="colorPrimaryDark">#3700B3</color>

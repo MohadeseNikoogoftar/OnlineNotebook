@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MyNotes." parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.MyNotes." parent="Theme.AppCompat.Light.NoActionBar"/>
     <!-- Base application theme. -->
     <style name="Theme.MyNotes" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
