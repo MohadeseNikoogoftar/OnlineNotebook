@@ -3,6 +3,7 @@ package ir.shariaty.mynotes
 import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
+
 data class Note(
     var documentId: String = "",
     var title: String = "",
@@ -11,7 +12,6 @@ data class Note(
     var date: String = "",
     var imageUrl: String? = null,
     var isChecked: Boolean = false // اضافه کردن متغیر isChecked
-
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -40,14 +40,14 @@ data class Note(
     override fun describeContents(): Int {
         return 0
     }
+
     companion object CREATOR : Parcelable.Creator<Note> {
         override fun createFromParcel(parcel: Parcel): Note {
             return Note(parcel)
         }
+
         override fun newArray(size: Int): Array<Note?> {
             return arrayOfNulls(size)
         }
-
     }
-
 }

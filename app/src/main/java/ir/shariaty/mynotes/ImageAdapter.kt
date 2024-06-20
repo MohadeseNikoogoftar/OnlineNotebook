@@ -1,5 +1,4 @@
 package ir.shariaty.mynotes
-
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater

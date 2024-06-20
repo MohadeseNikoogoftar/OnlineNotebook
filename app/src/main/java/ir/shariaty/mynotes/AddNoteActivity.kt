@@ -6,24 +6,24 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Calendar
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.util.*
 import kotlin.collections.HashMap
 
 class AddNoteActivity : AppCompatActivity() {
-
     private lateinit var noteTitleEditText: EditText
     private lateinit var noteContentEditText: EditText
     private lateinit var saveNoteButton: Button
-    private lateinit var selectImageButton: Button
+    private lateinit var backButton: ImageButton
+    private lateinit var selectImageButton: ImageButton  // Change the type to ImageButton
     private lateinit var imagesRecyclerView: RecyclerView
     private lateinit var firestore: FirebaseFirestore
     private lateinit var storageReference: StorageReference
@@ -34,13 +34,16 @@ class AddNoteActivity : AppCompatActivity() {
 
     private var position: Int = -1
     private var note: Note? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_note)
+
         noteTitleEditText = findViewById(R.id.noteTitleEditText)
         noteContentEditText = findViewById(R.id.noteContentEditText)
         saveNoteButton = findViewById(R.id.saveNoteButton)
-        selectImageButton = findViewById(R.id.selectImageButton)
+        backButton = findViewById(R.id.back_button)
+        selectImageButton = findViewById(R.id.selectImageButton)  // Correct the type here
         imagesRecyclerView = findViewById(R.id.imagesRecyclerView)
         noteDateEditText = findViewById(R.id.noteDateEditText)
         noteDateEditText.setText(getDefaultDate())
@@ -48,6 +51,12 @@ class AddNoteActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
         storageReference = FirebaseStorage.getInstance().reference
         mAuth = FirebaseAuth.getInstance()
+
+
+        backButton.setOnClickListener {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+        }
 
         imagesAdapter = ImagesAdapter(this, selectedImageUris) { position ->
             selectedImageUris.removeAt(position)
@@ -81,6 +90,7 @@ class AddNoteActivity : AppCompatActivity() {
         saveNoteButton.setOnClickListener {
             val title = noteTitleEditText.text.toString().trim()
             val content = noteContentEditText.text.toString().trim()
+
             if (title.isEmpty() || content.isEmpty()) {
                 Toast.makeText(this, "Please enter all the details", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -88,7 +98,6 @@ class AddNoteActivity : AppCompatActivity() {
 
             if (note == null) {
                 // Add new note
-                addNewNoteToFirestore(title, content)
                 if (selectedImageUris.isNotEmpty()) {
                     uploadImagesAndSaveNote(title, content)
                 } else {
@@ -96,7 +105,6 @@ class AddNoteActivity : AppCompatActivity() {
                 }
             } else {
                 // Update existing note
-                updateNoteInFirestore(note!!.documentId, title, content)
                 if (selectedImageUris.isNotEmpty()) {
                     uploadImagesAndUpdateNote(note!!.documentId, title, content)
                 } else {
@@ -130,39 +138,92 @@ class AddNoteActivity : AppCompatActivity() {
         }
     }
 
-    private fun addNewNoteToFirestore(title: String, content: String) {
 
-        private fun saveUpdatedNoteToFirestore(documentId: String, noteMap: HashMap<String, String>, imagesUrls: List<String>) {
-            firestore.collection("notes").document(documentId)
-                .set(noteMap)
-                .addOnSuccessListener {
-                    val updatedNote = Note(documentId = documentId, title = noteMap["title"] as String, content = noteMap["content"] as String, userId = noteMap["userId"] as String, date = noteMap["date"] as String, imageUrl = imagesUrls.joinToString(","))
-                    val resultIntent = Intent().apply {
-                        putExtra("note", updatedNote)
-                        putExtra("position", position)
+    private fun saveUpdatedNoteToFirestore(documentId: String, noteMap: HashMap<String, String>, imagesUrls: List<String>) {
+        firestore.collection("notes").document(documentId)
+            .set(noteMap)
+            .addOnSuccessListener {
+                val updatedNote = Note(documentId = documentId, title = noteMap["title"] as String, content = noteMap["content"] as String, userId = noteMap["userId"] as String, date = noteMap["date"] as String, imageUrl = imagesUrls.joinToString(","))
+                val resultIntent = Intent().apply {
+                    putExtra("note", updatedNote)
+                    putExtra("position", position)
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error updating note: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun uploadImagesAndSaveNote(title: String, content: String) {
+        val userId = mAuth.currentUser?.uid ?: return
+        val date = noteDateEditText.text.toString().trim()
+        val noteMap = hashMapOf(
+            "title" to title,
+            "content" to content,
+            "userId" to userId,
+            "date" to date,
+        )
+        val imagesUrls = mutableListOf<String>()
+        var uploadedImagesCount = 0
+        selectedImageUris.forEach { uri ->
+            val imageName = UUID.randomUUID().toString() // ایجاد نام تصادفی برای تصویر
+            val imageReference = storageReference.child("images/$imageName.jpg")
+            imageReference.putFile(uri)
+                .addOnSuccessListener { taskSnapshot ->
+                    imageReference.downloadUrl.addOnSuccessListener { imageUrl ->
+                        imagesUrls.add(imageUrl.toString())
+                        uploadedImagesCount++
+                        if (uploadedImagesCount == selectedImageUris.size) {
+                            noteMap["imageUrls"] = imagesUrls.joinToString(",")
+                            firestore.collection("notes")
+                                .add(noteMap)
+                                .addOnSuccessListener { documentReference ->
+                                    val note = Note(documentId = documentReference.id, title = title, content = content, userId = userId, date = date, imageUrl = imagesUrls.joinToString(","))
+                                    val resultIntent = Intent().apply {
+                                        putExtra("note", note)
+                                    }
+                                    setResult(RESULT_OK, resultIntent)
+                                    finish()
+                                }
+                                .addOnFailureListener { exception ->
+                                    Toast.makeText(this, "Error adding note: ${exception.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        }
                     }
-                    setResult(RESULT_OK, resultIntent)
-                    finish()
                 }
                 .addOnFailureListener { exception ->
-                    Toast.makeText(this, "Error updating note: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error uploading image: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
         }
+    }
 
-        private fun uploadImagesAndSaveNote(title: String, content: String) {
-            val userId = mAuth.currentUser?.uid ?: return
-            val date = noteDateEditText.text.toString().trim()
+    private fun uploadImagesAndUpdateNote(documentId: String, title: String, content: String) {
+        val userId = mAuth.currentUser?.uid ?: return
+        val date = noteDateEditText.text.toString().trim()
+        val noteMap = hashMapOf(
+            "title" to title,
+            "content" to content,
+            "userId" to userId,
+            "date" to date,
+        )
+        val imagesUrls = mutableListOf<String>()
+        var uploadedImagesCount = 0
 
-            val noteMap = hashMapOf(
-                "title" to title,
-                "content" to content,
-                "userId" to userId,
-                "date" to date // اضافه کردن تاریخ به noteMap
-                "date" to date,
-            )
-            val imagesUrls = mutableListOf<String>()
-            var uploadedImagesCount = 0
-            selectedImageUris.forEach { uri ->
+        // اضافه کردن عکس‌های موجود قبلی به لیست آدرس‌ها
+        note?.imageUrl?.split(",")?.let { imagesUrls.addAll(it) }
+
+        selectedImageUris.forEach { uri ->
+            if (uri.toString().startsWith("https://")) {
+                // عکس‌های موجود قبلی که به Uri تبدیل شده‌اند، اضافه شوند
+                uploadedImagesCount++
+                imagesUrls.add(uri.toString())
+                if (uploadedImagesCount == selectedImageUris.size) {
+                    noteMap["imageUrls"] = imagesUrls.joinToString(",")
+                    saveUpdatedNoteToFirestore(documentId, noteMap, imagesUrls)
+                }
+            } else {
                 val imageName = UUID.randomUUID().toString() // ایجاد نام تصادفی برای تصویر
                 val imageReference = storageReference.child("images/$imageName.jpg")
                 imageReference.putFile(uri)
@@ -172,19 +233,7 @@ class AddNoteActivity : AppCompatActivity() {
                             uploadedImagesCount++
                             if (uploadedImagesCount == selectedImageUris.size) {
                                 noteMap["imageUrls"] = imagesUrls.joinToString(",")
-                                firestore.collection("notes")
-                                    .add(noteMap)
-                                    .addOnSuccessListener { documentReference ->
-                                        val note = Note(documentId = documentReference.id, title = title, content = content, userId = userId, date = date, imageUrl = imagesUrls.joinToString(","))
-                                        val resultIntent = Intent().apply {
-                                            putExtra("note", note)
-                                        }
-                                        setResult(RESULT_OK, resultIntent)
-                                        finish()
-                                    }
-                                    .addOnFailureListener { exception ->
-                                        Toast.makeText(this, "Error adding note: ${exception.message}", Toast.LENGTH_SHORT).show()
-                                    }
+                                saveUpdatedNoteToFirestore(documentId, noteMap, imagesUrls)
                             }
                         }
                     }
@@ -193,120 +242,68 @@ class AddNoteActivity : AppCompatActivity() {
                     }
             }
         }
+    }
 
-        private fun uploadImagesAndUpdateNote(documentId: String, title: String, content: String) {
-            val userId = mAuth.currentUser?.uid ?: return
-            val date = noteDateEditText.text.toString().trim()
-            val noteMap = hashMapOf(
-                "title" to title,
-                "content" to content,
-                "userId" to userId,
-                "date" to date,
-            )
-            val imagesUrls = mutableListOf<String>()
-            var uploadedImagesCount = 0
-
-            // اضافه کردن عکس‌های موجود قبلی به لیست آدرس‌ها
-            note?.imageUrl?.split(",")?.let { imagesUrls.addAll(it) }
-
-            selectedImageUris.forEach { uri ->
-                if (uri.toString().startsWith("https://")) {
-                    // عکس‌های موجود قبلی که به Uri تبدیل شده‌اند، اضافه شوند
-                    uploadedImagesCount++
-                    imagesUrls.add(uri.toString())
-                    if (uploadedImagesCount == selectedImageUris.size) {
-                        noteMap["imageUrls"] = imagesUrls.joinToString(",")
-                        saveUpdatedNoteToFirestore(documentId, noteMap, imagesUrls)
-                    }
-                } else {
-                    val imageName = UUID.randomUUID().toString() // ایجاد نام تصادفی برای تصویر
-                    val imageReference = storageReference.child("images/$imageName.jpg")
-                    imageReference.putFile(uri)
-                        .addOnSuccessListener { taskSnapshot ->
-                            imageReference.downloadUrl.addOnSuccessListener { imageUrl ->
-                                imagesUrls.add(imageUrl.toString())
-                                uploadedImagesCount++
-                                if (uploadedImagesCount == selectedImageUris.size) {
-                                    noteMap["imageUrls"] = imagesUrls.joinToString(",")
-                                    saveUpdatedNoteToFirestore(documentId, noteMap, imagesUrls)
-                                }
-                            }
-                        }
-                        .addOnFailureListener { exception ->
-                            Toast.makeText(this, "Error uploading image: ${exception.message}", Toast.LENGTH_SHORT).show()
-                        }
+    private fun addNewNoteToFirestore(title: String, content: String, imageUrl: String?) {
+        val userId = mAuth.currentUser?.uid ?: return
+        val date = noteDateEditText.text.toString().trim()
+        val noteMap = hashMapOf(
+            "title" to title,
+            "content" to content,
+            "userId" to userId,
+            "date" to date,
+            "imageUrls" to imageUrl,
+        )
+        firestore.collection("notes")
+            .add(noteMap)
+            .addOnSuccessListener { documentReference ->
+                val note = Note(documentId = documentReference.id, title = title, content = content, userId = userId, date = date, imageUrl = imageUrl ?: "")
+                val resultIntent = Intent().apply {
+                    putExtra("note", note)
                 }
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
-        }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error adding note: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
 
-        private fun addNewNoteToFirestore(title: String, content: String, imageUrl: String?) {
-            val userId = mAuth.currentUser?.uid ?: return
-            val date = noteDateEditText.text.toString().trim()
-            val noteMap = hashMapOf(
-                "title" to title,
-                "content" to content,
-                "userId" to userId,
-                "date" to date,
-                "imageUrls" to imageUrl,
-            )
-            firestore.collection("notes")
-                .add(noteMap)
-                .addOnSuccessListener { documentReference ->
-                    val note = Note(documentId = documentReference.id, title = title, content = content, userId = userId)
-                    val note = Note(documentId = documentReference.id, title = title, content = content, userId = userId, date = date, imageUrl = imageUrl ?: "")
-                    val resultIntent = Intent().apply {
-                        putExtra("note", note)
-                    }
-                    setResult(RESULT_OK, resultIntent)
-                    finish()
+    private fun updateNoteInFirestore(documentId: String, title: String, content: String, imageUrl: String?) {
+        val userId = mAuth.currentUser?.uid ?: return
+        val date = noteDateEditText.text.toString().trim()
+        val noteMap = hashMapOf(
+            "title" to title,
+            "content" to content,
+            "userId" to userId,
+            "date" to date,
+            "imageUrls" to imageUrl,
+        )
+        firestore.collection("notes").document(documentId)
+            .set(noteMap)
+            .addOnSuccessListener {
+                val updatedNote = Note(documentId = documentId, title = title, content = content, userId = userId, date = date, imageUrl = imageUrl ?: "")
+                val resultIntent = Intent().apply {
+                    putExtra("note", updatedNote)
+                    putExtra("position", position)
                 }
-                .addOnFailureListener { exception ->
-                    Toast.makeText(this, "Error adding note: ${exception.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
-
-        private fun updateNoteInFirestore(documentId: String, title: String, content: String) {
-            private fun updateNoteInFirestore(documentId: String, title: String, content: String, imageUrl: String?) {
-                val userId = mAuth.currentUser?.uid ?: return
-                val date = noteDateEditText.text.toString().trim()
-
-                val noteMap = hashMapOf(
-                    "title" to title,
-                    "content" to content,
-                    "userId" to userId,
-                    "date" to date // اضافه کردن تاریخ به noteMap
-
-                    "date" to date,
-                    "imageUrls" to imageUrl,
-                )
-
-                firestore.collection("notes").document(documentId)
-                    .set(noteMap)
-                    .addOnSuccessListener {
-                        val updatedNote = Note(documentId = documentId, title = title, content = content, userId = userId)
-                        val updatedNote = Note(documentId = documentId, title = title, content = content, userId = userId, date = date, imageUrl = imageUrl ?: "")
-                        val resultIntent = Intent().apply {
-                            putExtra("note", updatedNote)
-                            putExtra("position", position)
-                        }
-                        setResult(RESULT_OK, resultIntent)
-                        finish()
-                    }
-                    .addOnFailureListener { exception ->
-                        Toast.makeText(this, "Error updating note: ${exception.message}", Toast.LENGTH_SHORT).show()
-                    }
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
-            private fun getDefaultDate(): String {
-                val calendar = Calendar.getInstance()
-                val year = calendar.get(Calendar.YEAR)
-                val month = calendar.get(Calendar.MONTH) + 1 // ماه‌ها از 0 شروع می‌شوند
-                val day = calendar.get(Calendar.DAY_OF_MONTH)
-                return "$year-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error updating note: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
+    }
 
+    private fun getDefaultDate(): String {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1 // ماه‌ها از 0 شروع می‌شوند
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        return "$year-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
+    }
 
-
-            companion object {
-                private const val REQUEST_CODE_IMAGE_PICK = 1
-            }
-        }
+    companion object {
+        private const val REQUEST_CODE_IMAGE_PICK = 1
+    }
+}
