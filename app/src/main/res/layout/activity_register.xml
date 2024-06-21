@@ -1,5 +1,4 @@
 
-<!--</RelativeLayout>-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/background2"
-        app:srcCompat="@drawable/background2" />
+        android:src="@drawable/background3"
+        app:srcCompat="@drawable/background3" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,78 +23,67 @@
         android:padding="16dp">
 
         <!-- Title Image -->
-
         <TextView
-            android:id="@+id/titleText5"
+            android:id="@+id/titleImage1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="60dp"
             android:fontFamily="@font/juliussansone"
-            android:letterSpacing="0.4"
-            android:text="Login"
+            android:letterSpacing="0.3"
+            android:text="@string/register"
             android:textColor="#000000"
             android:textSize="45sp" />
-
 
         <!-- Email EditText -->
         <EditText
             android:id="@+id/email"
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="120dp"
-            android:alpha="0.7"
-            android:background="@drawable/rounded_button1"
+            android:layout_height="48dp"
+            android:layout_marginTop="150dp"
+            android:alpha="0.9"
+            android:background="@drawable/rounded_button2"
             android:fontFamily="@font/caveat"
             android:gravity="center"
             android:hint="Email"
-            android:minWidth="48dp"
-            android:minHeight="48dp"
             android:padding="10dp"
             android:textAlignment="center"
-            android:textColorHint="#66000000"
+            android:textColorHint="#80FFFFFF"
             android:textSize="25dp" />
 
         <!-- Password EditText -->
         <EditText
             android:id="@+id/password"
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="10dp"
-            android:alpha="0.7"
-            android:background="@drawable/rounded_button1"
+            android:alpha="0.9"
+            android:background="@drawable/rounded_button2"
             android:fontFamily="@font/caveat"
             android:gravity="center"
             android:hint="Password"
             android:inputType="textPassword"
-            android:minWidth="48dp"
-            android:minHeight="48dp"
             android:padding="10dp"
             android:textAlignment="center"
-            android:textColorHint="#66000000"
+            android:textColorHint="#80FFFFFF"
             android:textSize="25dp" />
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginBottom="50dp" />
+            android:layout_height="20dp" />
 
         <Button
-            android:id="@+id/loginButton"
-            android:layout_width="171dp"
+            android:id="@+id/registerButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:alpha="0.8"
-            android:backgroundTint="#B7906C"
-            android:contentDescription="@string/login"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="#EDEDED"
+            android:alpha="0.9"
+            android:contentDescription="@string/register"
             android:fontFamily="@font/caveat"
-            android:text="@string/login"
-            android:textColor="#FFFFFF"
+            android:text="@string/register"
+            android:textColor="#000"
             android:textSize="25sp" />
     </LinearLayout>
-
-
-
 
     <!-- Back Button -->
     <ImageButton
@@ -107,6 +95,5 @@
         android:layout_marginTop="20dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/back"
-        android:contentDescription="@string/back_button" />
-
+        android:contentDescription="Back_button" />
 </RelativeLayout>
