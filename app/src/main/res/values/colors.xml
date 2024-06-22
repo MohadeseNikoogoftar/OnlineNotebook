@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#C63A0505</color>
-    <color name="purple_500">#B7D5C965</color>
-    <color name="purple_700">#DCEDAF54</color>
-    <color name="teal_200">#9A613E0A</color>
-    <color name="teal_700">#D2366137</color>
+    <color name="purple_200">#DDCEA1</color>
+    <color name="purple_500">#73612C</color>
+    <color name="purple_700">#E8C24E</color>
+    <color name="teal_200">#096C62</color>
+    <color name="teal_700">#E3ED83</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
     <!-- Light mode colors -->
-<color name="colorPrimary">#6200EE</color>
-<color name="colorPrimaryDark">#3700B3</color>
-<color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#EFC64B</color>
+    <color name="colorPrimaryDark">#524315</color>
+    <color name="colorAccent">#CEC0AB</color>
+
 
     <!-- Dark mode colors -->
-<color name="colorPrimaryDarkMode">#BB86FC</color>
-<color name="colorPrimaryVariantDarkMode">#3700B3</color>
-<color name="colorAccentDarkMode">#03DAC5</color>
-    </resources>
+    <color name="colorPrimaryDarkMode">#685A2F</color>
+    <color name="colorPrimaryVariantDarkMode">#EADEBD</color>
+    <color name="colorAccentDarkMode">#EAB77A</color>
 
-
+</resources>
