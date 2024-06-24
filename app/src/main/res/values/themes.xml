@@ -4,9 +4,9 @@
     <style name="Theme.MyNotes" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#EFC64B</item>
-        <item name="colorPrimaryDark">#524315</item>
-        <item name="colorAccent">#CEC0AB</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryDark">#C2A386</item>
+        <item name="colorAccent">#553B15</item>
+        <item name="colorOnPrimary">#D6CBBE</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Add other theme attributes here -->
     </style>

@@ -46,7 +46,7 @@
             android:layout_marginTop="120dp"
             android:alpha="0.7"
             android:background="@drawable/rounded_button1"
-            android:fontFamily="@font/caveat"
+            android:fontFamily="@font/juraregular"
             android:gravity="center"
             android:hint="Email"
             android:minWidth="48dp"
@@ -64,7 +64,7 @@
             android:layout_marginTop="10dp"
             android:alpha="0.7"
             android:background="@drawable/rounded_button1"
-            android:fontFamily="@font/caveat"
+            android:fontFamily="@font/juraregular"
             android:gravity="center"
             android:hint="Password"
             android:inputType="textPassword"
@@ -100,8 +100,8 @@
     <!-- Back Button -->
     <ImageButton
         android:id="@+id/back_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
